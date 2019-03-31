@@ -6,7 +6,6 @@ __copyright__ = "Copyright 2019, Floydasaur.us"
 
 # This a real rough faux-code of what
 # I want this damn script to accomplish.
-#
 # import openyxl    # I operate in an Excel world, CSV could be done too I suppose if that's easier.
 #
 # AET = 1 # Probably the most common AET
