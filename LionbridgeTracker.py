@@ -1,45 +1,75 @@
 #!/bin/env/ python
-"""Automation of time tracking for Lionbridge Raterhub."""
+"""Automates time-keeping for Lionbridge's Raterhub job with output to an MS Excel spreadsheet.."""
 
-__author__ = "Floyd Zamarripa"
-__copyright__ = "Copyright 2019, Floydasaur.us"
+__author__ = 'Floydasaurus'
+__copyright__ = 'Copyright 2019, Floydasaur.us'
 
-# This a real rough faux-code of what
-# I want this damn script to accomplish.
-# import openyxl    # I operate in an Excel world, CSV could be done too I suppose if that's easier.
-#
-# AET = 1 # Probably the most common AET
-# startXKey = key to look for to StartTimeX
-# stopTimeKey = key to look for to EndTimer
-# probably a start time for S as well, but I've never seen one actually come up.
-#
-# open workbook # must be in current working directory (cwd). os.getcwd() or os.chdir()
-# make the sheet1 active if that's necessary # sheet = openpyxl.load_workbook('example.xlsx').get_sheet_by_name('Sheet1')
-# sheet = wb.active
-#
-# Column Headers: ADate | BStart | CProject | DAET | EEnd | FTotal Time
-# ListenForKeypress()
-# 
-# StartTimeX
-# On keypress(mouse7){
-#    sheet['A1'] = today's date
-#    sheet['B1'] = today's time # Start Time
-#    sheet['C1'] = "x"
-#    sheet['D1'] = getAET()
-# }
-#
-# EndTimer
-# On keypress(mouse9){ # my preferred mousebuttons
-#     sheet['E1'] = today's time # End Time
-#     sheet['F1'] = sheet['A5'].value - sheet['A2'].value # right?
-#     
-#
-# setAET(value){
-#     AET = value
-# }
-#
-# getAET(){
-#     return AET;
-# }
-# 
-# I guess at some point save the worksheet? how the f does openpyxl do this.
+import datetime
+import keyboard
+
+import openpyxl  # pyWinhook, wx - might not need to use these?
+
+# Initializing some variables/objects
+currentAET = 1.0
+filename = 'Data/Lionbridgetracker.xlsx'  # Put your own file here
+startXKey = ']'
+startSKey = '['
+stopTimeKey = '\\'
+exitKey = "~"  # Unlikely to press by accident.
+activeRow = 2
+
+wb = openpyxl.load_workbook(fileName)
+activeSheet = wb.get_sheet_by_name('Times')
+
+
+def getDate():
+	"""Returns the date in the format mm/dd/yyyy"""
+	return datetime.datetime.now().strftime('%m/%d/%Y')
+
+
+def getTime():
+	"""Returns the time in the format hh:mm:ss"""
+	return datetime.datetime.now().strftime('%I:%M:%S')
+
+
+def setAET(newAET):
+	"""Sets the new estimated time, in minutes, for a Raterhub task."""
+	currentAET = newAET
+	return
+
+
+def getFirstEmpty():
+	for rowNum in range(2, activeSheet.max_row):
+		emptyRowCheck = activeSheet.cell(row=rowNum, column=1).value
+		if emptyRowCheck == "":
+			return rowNum
+
+
+def startxtimer():
+	activeRow = getFirstEmpty()
+	print(activeRow)
+	activeSheet.cell(row=activeRow, column=1).value = getDate()
+	activeSheet.cell(row=activeRow, column=2).value = getTime()
+	activeSheet.cell(row=activeRow, column=3).value = 'X'
+	activeSheet.cell(row=activeRow, column=4).value = currentAET
+	return
+
+
+def stoptimer():
+	activeSheet.cell(row=activeRow, column=5).value = getTime()
+	return
+
+
+# Column Headers: A1Date | B2Start | C3Project | D4AET | E5End | F6Total Time
+
+while True:
+	if keyboard.is_pressed(startXKey):
+		startxtimer()
+		wb.save(filename)
+	if keyboard.is_pressed(stopTimeKey):
+		stoptimer()
+		wb.save(filename)
+	if keyboard.is_pressed(exitKey):
+		break
+
+wb.save(filename)
